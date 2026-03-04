@@ -1,0 +1,9 @@
+.venv/
+__pycache__/
+.git/
+.adk/
+uv.lock
+*_tmp*/
+agent2.py
+agent3.py
+config.py

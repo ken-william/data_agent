@@ -1,0 +1,27 @@
+sources:
+  my-bigquery-source:
+    kind: bigquery
+    project: theophane
+    location: global
+    allowedDatasets:
+      - ecommarket
+
+tools:
+  conversational_analyst:
+    kind: bigquery-conversational-analytics
+    source: my-bigquery-source
+    description: |
+      Utilisez cet outil pour analyser les données de l'entreprise.
+      IMPORTANT : Lorsque vous appelez cet outil, vous devez remplir le paramètre table_references UNIQUEMENT avec les tables suivantes, en utilisant leur chemin complet :
+      - 'theophane.ecommarket.dim_stores' : Référentiel de nos points de vente physiques (Boutiques Concept). Contient la localisation et les gérants.
+      - 'theophane.ecommarket.dim_products' : Catalogue complet. Inclut les marques (brand_name), les catégories et les prix de base.
+      - 'theophane.ecommarket.dim_customers' : Profils clients avec indicateurs IA.
+      - 'theophane.ecommarket.fact_offline_sales' : Historique des transactions réelles en magasin (quantités, revenus, remises).
+      - 'theophane.ecommarket.fact_web_interactions' : Comportement digital. Permet de mesurer l'intérêt des clients.
+      
+      SYNTAXE : Utiliser le format [{"projectId": "theophane", "datasetId": "ecommarket", "tableId": "..."}] 
+      les tables : dim_stores, dim_products, dim_customers, fact_offline_sales, fact_web_interactions.
+
+toolsets:
+  my_bq_toolset:
+    - conversational_analyst

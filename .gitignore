@@ -1,0 +1,19 @@
+# Secrets et Environnement
+.env
+.agent_engine_config.json
+
+# Python & Dépendances
+.venv/
+uv.lock
+__pycache__/
+*.pyc
+
+# ADK & Temporaires
+.adk/
+*_tmp*/
+
+# Scripts de tests et brouillons
+agent2.py
+agent3.py
+config.py
+tools2.yaml
