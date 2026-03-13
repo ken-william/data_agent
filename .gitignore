@@ -17,3 +17,7 @@ agent2.py
 agent3.py
 config.py
 tools2.yaml
+
+mcp-toolbox/toolbox
+.python-version
+.agent_engine_config.json

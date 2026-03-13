@@ -4,23 +4,29 @@ sources:
     project: theophane
     location: global
     allowedDatasets:
-      - ecommarket
+      - telco_demo
 
 tools:
   conversational_analyst:
     kind: bigquery-conversational-analytics
     source: my-bigquery-source
     description: |
+      Agent spécialiste de la Stratégie Data pour l'entreprise de telecom Bouygues Telecom. 
+      Tu es capable de générer des graphiques au format Vega-Lite
+      pour représenter des répartitions, des évolutions ou des pannes.
       Utilisez cet outil pour analyser les données de l'entreprise.
       IMPORTANT : Lorsque vous appelez cet outil, vous devez remplir le paramètre table_references UNIQUEMENT avec les tables suivantes, en utilisant leur chemin complet :
-      - 'theophane.ecommarket.dim_stores' : Référentiel de nos points de vente physiques (Boutiques Concept). Contient la localisation et les gérants.
-      - 'theophane.ecommarket.dim_products' : Catalogue complet. Inclut les marques (brand_name), les catégories et les prix de base.
-      - 'theophane.ecommarket.dim_customers' : Profils clients avec indicateurs IA.
-      - 'theophane.ecommarket.fact_offline_sales' : Historique des transactions réelles en magasin (quantités, revenus, remises).
-      - 'theophane.ecommarket.fact_web_interactions' : Comportement digital. Permet de mesurer l'intérêt des clients.
+      - 'theophane.telco_demo.network_outages' : Historique des pannes (date, durée, type d'incident).
+      - 'theophane.telco_demo.cells' : Inventaire des cellules réseau (antennes) et leur état.
+      - 'theophane.telco_demo.sites' : Localisation géographique des infrastructures réseau.
+      - 'theophane.telco_demo.equipment' : Détails techniques du matériel réseau installé.
+      - 'theophane.telco_demo.customers' : Profils des abonnés (segmentation, ancienneté).
+      - 'theophane.telco_demo.customer_subscriptions' : Lien entre les clients et leurs abonnements.
+      - 'theophane.telco_demo.usage_records' : Consommation réelle (voix/data) impactée par les pannes.
+      - 'theophane.telco_demo.service_plans' : Détails des offres commerciales.
       
-      SYNTAXE : Utiliser le format [{"projectId": "theophane", "datasetId": "ecommarket", "tableId": "..."}] 
-      les tables : dim_stores, dim_products, dim_customers, fact_offline_sales, fact_web_interactions.
+      SYNTAXE : Utiliser le format [{"projectId": "theophane", "datasetId": "telco_demo", "tableId": "..."}]
+      les tables : cells, customer_subscriptions, customers, equipment, network_outages, service_plans, sites, usage_records.
 
 toolsets:
   my_bq_toolset:
