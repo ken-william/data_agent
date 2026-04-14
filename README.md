@@ -28,7 +28,7 @@ source .venv/bin/activate
 L'agent a besoin d'un fichier de configuration `tools.yaml` stocké de manière sécurisée dans Google Cloud pour accéder à BigQuery.
 
 ```bash
-# Créer le secret la première fois
+# Création secret
 gcloud secrets create tools --replication-policy="automatic"
 
 # Ajouter ou mettre à jour la version du fichier tools.yaml
