@@ -11,11 +11,76 @@ tools:
     kind: bigquery-conversational-analytics
     source: my-bigquery-source
     description: |
-      Agent spécialiste de la Stratégie Data pour l'entreprise de telecom Bouygues Telecom. 
-      Tu es capable de générer des graphiques au format Vega-Lite
-      pour représenter des répartitions, des évolutions ou des pannes.
-      Utilisez cet outil pour analyser les données de l'entreprise.
-      IMPORTANT : Lorsque vous appelez cet outil, vous devez remplir le paramètre table_references UNIQUEMENT avec les tables suivantes, en utilisant leur chemin complet :
+      Agent spécialiste de la Stratégie Data pour l'entreprise de telecom Bouygues Telecom.
+      Tu es capable de générer des graphiques pour représenter des répartitions, des évolutions ou des pannes.
+      Utilise cet outil conversationnal-analytics pour analyser les données de l'entreprise.
+
+      Les données sont disponibles dans le dataset `theophane.telco_demo`.
+
+      **Tables de Données Structurées Disponibles :**
+      Ces tables contiennent des données tabulaires classiques :
+      - 'theophane.telco_demo.network_outages'
+      - 'theophane.telco_demo.cells'
+      - 'theophane.telco_demo.sites'
+      - 'theophane.telco_demo.equipment'
+      - 'theophane.telco_demo.customers'
+      - 'theophane.telco_demo.customer_subscriptions'
+      - 'theophane.telco_demo.usage_records'
+      - 'theophane.telco_demo.service_plans'
+
+      **Table de Données Non Structurées (Objets) Disponible :**
+      - 'theophane.telco_demo.telco_doc_archives' : Table d'objets des rapports PDF et autres documents d'archive provenant de `gs://telco_doc/Archive/`.
+
+      **Comment Analyser les Documents dans `theophane.telco_demo.telco_doc_archives` :**
+
+      1.  **Extraction de Texte à partir de PDFs (via Document AI) :**
+          Utilise `ML.PROCESS_DOCUMENT` avec le modèle distant `theophane.telco_demo.document_ai_processor`. Ce modèle est lié à un processeur Document AI de type "Custom Extractor" configuré pour extraire des champs structurés des rapports de panne.
+          Exemple de requête SQL pour extraire les détails des 10 derniers rapports PDF :
+          ```sql
+          SELECT
+            uri,
+            ml_process_document_result, -- Contient le JSON complet extrait par Document AI
+            ml_process_document_status,
+            -- Accédez directement aux champs extraits définis dans le schéma Document AI :
+            incident_id,
+            issue_date,
+            site_id,
+            severity,
+            start_datetime,
+            end_datetime,
+            total_duration,
+            corrective_actions, -- ARRAY<STRUCT> si configuré
+            diagnostic_conclusion
+          FROM
+            ML.PROCESS_DOCUMENT(
+              MODEL `theophane.telco_demo.document_ai_processor`,
+              TABLE `theophane.telco_demo.telco_doc_archives`
+            )
+          WHERE content_type = 'application/pdf'
+          ORDER BY updated DESC
+          LIMIT 10;
+          ```
+
+      2.  **Classification d'images (si présentes) :**
+          Utilise `AI.CLASSIFY` en fournissant une URL signée de l'image via `OBJ.GET_ACCESS_URL`.
+          Exemple de requête SQL pour classifier des images dans les archives :
+          ```sql
+          SELECT
+            uri,
+            AI.CLASSIFY(
+              OBJ.GET_ACCESS_URL(images.ref, 'r'), -- Obtient une URL signée pour l'accès en lecture
+              categories => ['diagramme', 'photo', 'schéma', 'carte réseau', 'équipement', 'autre'],
+              endpoint => 'gemini-3-flash-preview' -- Utilise le modèle multimodal gemini-3-flash-preview
+            ) AS image_category,
+            content_type
+          FROM
+            `theophane.telco_demo.telco_doc_archives` AS images
+          WHERE content_type LIKE 'image/%' -- Filtre pour ne traiter que les images
+          LIMIT 5;
+          ```
+          Ajuste les catégories (`['diagramme', ...]`) selon les besoins.
+
+      IMPORTANT : Lorsque vous appelez cet outil, vous devez remplir le paramètre `table_references` UNIQUEMENT avec les tables suivantes, en utilisant leur chemin complet :
       - 'theophane.telco_demo.network_outages' : Historique des pannes (date, durée, type d'incident).
       - 'theophane.telco_demo.cells' : Inventaire des cellules réseau (antennes) et leur état.
       - 'theophane.telco_demo.sites' : Localisation géographique des infrastructures réseau.
@@ -24,9 +89,10 @@ tools:
       - 'theophane.telco_demo.customer_subscriptions' : Lien entre les clients et leurs abonnements.
       - 'theophane.telco_demo.usage_records' : Consommation réelle (voix/data) impactée par les pannes.
       - 'theophane.telco_demo.service_plans' : Détails des offres commerciales.
-      
+      - 'theophane.telco_demo.telco_doc_archives'
+
       SYNTAXE : Utiliser le format [{"projectId": "theophane", "datasetId": "telco_demo", "tableId": "..."}]
-      les tables : cells, customer_subscriptions, customers, equipment, network_outages, service_plans, sites, usage_records.
+      les tables : cells, customer_subscriptions, customers, equipment, network_outages, service_plans, sites, usage_records, telco_doc_archives.
 
 toolsets:
   my_bq_toolset:
